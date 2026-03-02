@@ -1,0 +1,19 @@
+{
+  "name": "consensus",
+  "version": "1.0.0",
+  "description": "Get unstuck by querying multiple AI providers (GPT-5, Gemini, etc.) for diverse perspectives",
+  "license": "MIT",
+  "author": "Mark Kimura",
+  "repository": "https://github.com/mark-kimura/consensus-plugin",
+  "keywords": [
+    "consensus",
+    "multi-ai",
+    "multi-provider",
+    "gpt-5",
+    "gemini",
+    "perplexity",
+    "openrouter",
+    "second-opinion",
+    "cross-check"
+  ]
+}
