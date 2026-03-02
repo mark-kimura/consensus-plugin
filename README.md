@@ -1,10 +1,10 @@
 # Consensus — Multi-AI Provider Plugin for Claude Code
 
-Get unstuck by querying multiple AI providers (GPT-5, Gemini, etc.) for diverse perspectives, right from within Claude Code.
+Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, etc.) for diverse perspectives, right from within Claude Code.
 
 ## How It Works
 
-When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5, Gemini 2.5 Pro, and Perplexity — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
+When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5.2, Gemini 3.1 Pro, and Perplexity — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
 
 ## Installation
 
@@ -19,7 +19,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Set one or more of these environment variables (you only need the providers you want to use):
 
 ```bash
-export OPENAI_API_KEY="sk-..."          # OpenAI API (GPT-5)
+export OPENAI_API_KEY="sk-..."          # OpenAI API (GPT-5.2)
 export GEMINI_API_KEY="AI..."           # Google Gemini API
 export OPENROUTER_API_KEY="sk-or-..."   # OpenRouter (Perplexity, or any provider)
 ```
@@ -40,7 +40,9 @@ claude --plugin-dir /path/to/consensus-plugin
 
 ## Usage
 
-### Slash Command
+### Slash Commands
+
+**Ask for consensus:**
 
 ```
 /consensus:ask help me optimize the SSE connection handling
@@ -50,6 +52,14 @@ Or without arguments (Claude infers from conversation context):
 
 ```
 /consensus:ask
+```
+
+**Update provider models:**
+
+```
+/consensus:update              # Update all providers to latest models
+/consensus:update openai       # Update only OpenAI
+/consensus:update check        # Dry-run: show current vs. latest without changes
 ```
 
 ### Natural Language (Skill)
@@ -89,7 +99,7 @@ The plugin works out of the box with environment variables. For advanced configu
 
 | Variable | Provider | Notes |
 |---|---|---|
-| `OPENAI_API_KEY` | OpenAI GPT-5 | Direct API access |
+| `OPENAI_API_KEY` | OpenAI GPT-5.2 | Direct API access |
 | `GEMINI_API_KEY` | Google Gemini | Direct API access |
 | `OPENROUTER_API_KEY` | OpenRouter | Proxies Perplexity, Gemini, and others |
 
@@ -110,7 +120,8 @@ consensus-plugin/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest
 ├── commands/
-│   └── ask.md                   # /consensus:ask command
+│   ├── ask.md                   # /consensus:ask command
+│   └── update.md                # /consensus:update command
 ├── skills/
 │   └── multi-ai-consensus/
 │       └── SKILL.md             # Auto-triggered skill

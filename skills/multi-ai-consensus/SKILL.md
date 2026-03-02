@@ -2,7 +2,7 @@
 description: >
   When the user wants to cross-check ideas across multiple AI providers — look for phrases like
   "consensus", "multiple perspectives", "what do other AIs think", "cross-check", "second opinion",
-  "ask other models", or "get diverse perspectives". This skill queries GPT-5, Gemini, and
+  "ask other models", or "get diverse perspectives". This skill queries GPT-5.2, Gemini, and
   Perplexity concurrently and synthesizes their responses. NOTE: This calls external paid APIs
   using the user's own API keys, so only trigger when the user clearly intends it.
 allowed-tools:

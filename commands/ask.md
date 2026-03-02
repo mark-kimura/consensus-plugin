@@ -11,7 +11,7 @@ argument-hint: "[optional: specific focus area or leave empty for context-based]
 
 # Consensus — Query Multiple AIs
 
-You will analyze the user's request and current context, craft a comprehensive prompt, then query multiple AI providers concurrently (GPT-5, Gemini 2.5 Pro, Perplexity via OpenRouter) and consolidate their responses.
+You will analyze the user's request and current context, craft a comprehensive prompt, then query multiple AI providers concurrently (GPT-5.2, Gemini 3.1 Pro, Perplexity via OpenRouter) and consolidate their responses.
 
 Arguments provided: $ARGUMENTS
 
@@ -80,8 +80,8 @@ When $ARGUMENTS is empty, gather context by:
 ## AI Providers
 
 Queries these providers concurrently:
-- **OpenAI GPT-5**: Responses API with reasoning capabilities
-- **Google Gemini 2.5 Pro**: Large context with thinking capabilities
+- **OpenAI GPT-5.2**: Responses API with reasoning capabilities
+- **Google Gemini 3.1 Pro**: Large context with thinking capabilities
 - **Perplexity Sonar**: Built-in web search and research capabilities
 
 Providers with missing API keys are silently skipped. At least one key is required.

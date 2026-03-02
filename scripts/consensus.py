@@ -44,21 +44,21 @@ DEFAULT_CONFIG = {
         "openai": {
             "enabled": True,
             "use_openrouter": False,
-            "model": "gpt-5",
+            "model": "gpt-5.2",
             "endpoint": "https://api.openai.com/v1",
             "openrouter_model": {
-                "none": "openai/gpt-5-chat",
-                "web": "openai/gpt-5-chat:online",
+                "none": "openai/gpt-5.2",
+                "web": "openai/gpt-5.2:online",
             },
         },
         "gemini": {
             "enabled": True,
             "use_openrouter": True,
-            "model": "gemini-2.5-pro",
+            "model": "gemini-3.1-pro-preview",
             "endpoint": "https://generativelanguage.googleapis.com/v1beta",
             "openrouter_model": {
-                "none": "google/gemini-2.5-pro",
-                "web": "google/gemini-2.5-pro:online",
+                "none": "google/gemini-3.1-pro-preview",
+                "web": "google/gemini-3.1-pro-preview:online",
             },
         },
         "perplexity": {
@@ -222,10 +222,10 @@ class OpenAIProvider(AIProvider):
                                     return c.get("text", "")
             if "output" in result:
                 return str(result["output"])
-            print("Could not extract text from GPT-5 response structure")
+            print("Could not extract text from GPT-5.2 response structure")
             return None
         except Exception as e:
-            print(f"Error parsing GPT-5 response: {e}")
+            print(f"Error parsing GPT-5.2 response: {e}")
             return None
 
     def _enhance_prompt(self, prompt: str, search_mode: str) -> str:
