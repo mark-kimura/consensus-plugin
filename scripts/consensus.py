@@ -5,7 +5,7 @@
 # ///
 """
 AI consensus engine — queries multiple AI providers concurrently and consolidates responses.
-Supports OpenAI, Gemini, and Perplexity APIs with configurable web search modes.
+Supports OpenAI and Gemini via OpenRouter with configurable web search modes.
 
 Designed to be run via `uv run consensus.py` which auto-resolves dependencies.
 
@@ -43,7 +43,7 @@ DEFAULT_CONFIG = {
     "providers": {
         "openai": {
             "enabled": True,
-            "use_openrouter": False,
+            "use_openrouter": True,
             "model": "gpt-5.2",
             "endpoint": "https://api.openai.com/v1",
             "openrouter_model": {
@@ -61,21 +61,20 @@ DEFAULT_CONFIG = {
                 "web": "google/gemini-3.1-pro-preview:online",
             },
         },
-        "perplexity": {
+        "kimi": {
             "enabled": True,
             "use_openrouter": True,
-            "model": "perplexity/sonar",
-            "endpoint": "https://openrouter.ai/api/v1",
+            "model": "kimi-k2.5",
             "openrouter_model": {
-                "none": "perplexity/sonar",
-                "web": "perplexity/sonar-reasoning",
+                "none": "moonshotai/kimi-k2.5",
+                "web": "moonshotai/kimi-k2.5",
             },
         },
     },
     "settings": {
         "default_output_dir": "consensus_docs",
         "default_search_mode": "web",
-        "max_tokens": 4000,
+        "max_tokens": 32768,
         "max_tokens_gemini": 32768,
         "temperature": 0.7,
         "concurrent_requests": True,
@@ -136,9 +135,6 @@ def load_config(config_path: Optional[str] = None, plugin_root: Optional[str] = 
         config["api_keys"]["gemini"] = os.getenv("GEMINI_API_KEY")
     if os.getenv("OPENROUTER_API_KEY"):
         config["api_keys"]["openrouter"] = os.getenv("OPENROUTER_API_KEY")
-    if os.getenv("PERPLEXITY_API_KEY") and not config["api_keys"].get("openrouter"):
-        config["api_keys"]["openrouter"] = os.getenv("PERPLEXITY_API_KEY")
-
     return config
 
 
@@ -155,6 +151,9 @@ class AIProvider:
         self.available = bool(api_key)
         self.config = config
 
+    def get_model_for_mode(self, search_mode: str) -> str:
+        return ""
+
     async def query(self, session: aiohttp.ClientSession, prompt: str, search_mode: str) -> Optional[str]:
         raise NotImplementedError
 
@@ -165,6 +164,9 @@ class OpenAIProvider(AIProvider):
     def __init__(self, api_key: str, config: Dict):
         super().__init__("OpenAI", api_key, config)
         self.base_url = config["endpoints"]["openai"]
+
+    def get_model_for_mode(self, search_mode: str) -> str:
+        return self.config["providers"]["openai"]["model"]
 
     async def query(self, session: aiohttp.ClientSession, prompt: str, search_mode: str) -> Optional[str]:
         if not self.available:
@@ -243,6 +245,9 @@ class GeminiProvider(AIProvider):
         super().__init__("Gemini", api_key, config)
         self.base_url = config["endpoints"]["gemini"]
 
+    def get_model_for_mode(self, search_mode: str) -> str:
+        return self.config["providers"]["gemini"]["model"]
+
     async def query(self, session: aiohttp.ClientSession, prompt: str, search_mode: str) -> Optional[str]:
         if not self.available:
             return None
@@ -303,49 +308,6 @@ class GeminiProvider(AIProvider):
         return prompt
 
 
-class PerplexityProvider(AIProvider):
-    """Perplexity AI provider via OpenRouter."""
-
-    def __init__(self, api_key: str, config: Dict):
-        super().__init__("Perplexity", api_key, config)
-        self.base_url = config["endpoints"]["openrouter"]
-
-    async def query(self, session: aiohttp.ClientSession, prompt: str, search_mode: str) -> Optional[str]:
-        if not self.available:
-            return None
-
-        model = self._get_model(search_mode)
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/mark-kimura/consensus-plugin",
-            "X-Title": "Consensus Multi-Provider Query Tool",
-        }
-        data = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": self.config["settings"]["max_tokens"],
-        }
-
-        try:
-            async with session.post(f"{self.base_url}/chat/completions", headers=headers, json=data) as response:
-                if response.status == 200:
-                    result = await response.json()
-                    return result["choices"][0]["message"]["content"]
-                else:
-                    error_text = await response.text()
-                    print(f"Perplexity (OpenRouter) API error: {response.status} - {error_text}")
-                    return None
-        except Exception as e:
-            print(f"Error querying Perplexity via OpenRouter: {e}")
-            return None
-
-    def _get_model(self, search_mode: str) -> str:
-        if search_mode == "web":
-            return "perplexity/sonar-reasoning"
-        return "perplexity/sonar"
-
-
 class OpenRouterProvider(AIProvider):
     """Generic OpenRouter provider for any model."""
 
@@ -402,15 +364,7 @@ async def query_all_providers(providers: List[AIProvider], prompt: str, search_m
     responses = {}
 
     async def query_with_progress(provider: AIProvider, session: aiohttp.ClientSession):
-        model_name = ""
-        if hasattr(provider, "get_model_for_mode"):
-            model_name = provider.get_model_for_mode(search_mode)
-        elif provider.name == "OpenAI":
-            model_name = provider.config["providers"]["openai"]["model"]
-        elif provider.name == "Gemini":
-            model_name = provider.config["providers"]["gemini"]["model"]
-        elif provider.name == "Perplexity":
-            model_name = "perplexity/sonar-reasoning" if search_mode == "web" else "perplexity/sonar"
+        model_name = provider.get_model_for_mode(search_mode)
 
         print(f"  * {provider.name} ({model_name}): Starting...", flush=True)
         start_time = time.time()
@@ -478,10 +432,7 @@ def setup_providers(config: Dict) -> List[AIProvider]:
             if not openrouter_key:
                 print(f"Warning: {provider_name} configured for OpenRouter but no key found, skipping...", flush=True)
                 continue
-            if provider_name == "perplexity":
-                providers.append(PerplexityProvider(openrouter_key, config))
-            else:
-                providers.append(OpenRouterProvider(openrouter_key, provider_config["openrouter_model"], provider_name, config))
+            providers.append(OpenRouterProvider(openrouter_key, provider_config["openrouter_model"], provider_name, config))
         else:
             api_key = config["api_keys"].get(provider_name)
             if not api_key:

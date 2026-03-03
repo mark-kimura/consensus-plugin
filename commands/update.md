@@ -6,7 +6,7 @@ allowed-tools:
   - Bash
   - Glob
 description: Update AI provider model versions by searching for the latest available models
-argument-hint: "[optional: openai|gemini|perplexity|all|check]"
+argument-hint: "[optional: openai|gemini|kimi|all|check] [--local]"
 ---
 
 # Consensus — Update Provider Models
@@ -19,12 +19,18 @@ Arguments provided: $ARGUMENTS
 
 ### 1. Parse Arguments
 
-Determine the scope from `$ARGUMENTS`:
+Determine the scope and target from `$ARGUMENTS`:
+
+**Provider scope:**
 - **`openai`** — Update only the OpenAI provider
 - **`gemini`** — Update only the Gemini provider
-- **`perplexity`** — Update only the Perplexity provider
+- **`kimi`** — Update only the Kimi provider
 - **`all`** or empty — Update all providers (default)
 - **`check`** — Dry-run: show current vs. latest versions without making changes
+
+**Target flag:**
+- **`--local`** — Update only `./consensus_config.json` (current project). Creates it from the plugin template if it doesn't exist.
+- **Default (no flag)** — Update the plugin template at `${CLAUDE_PLUGIN_ROOT}/consensus_config.json` (affects all projects that don't have a local override)
 
 ### 2. Read Current Configuration
 
@@ -43,9 +49,9 @@ Display the current model versions in a table:
 | Gemini | `model` | (value) |
 | Gemini | `openrouter_model.none` | (value) |
 | Gemini | `openrouter_model.web` | (value) |
-| Perplexity | `model` | (value) |
-| Perplexity | `openrouter_model.none` | (value) |
-| Perplexity | `openrouter_model.web` | (value) |
+| Kimi | `model` | (value) |
+| Kimi | `openrouter_model.none` | (value) |
+| Kimi | `openrouter_model.web` | (value) |
 
 ### 3. Search for Latest Models
 
@@ -53,7 +59,7 @@ Use WebSearch to find the latest stable/GA model versions for each in-scope prov
 
 - **OpenAI**: Search for the latest GPT model available via the OpenAI API and on OpenRouter. Look for the current flagship model name.
 - **Gemini**: Search for the latest Google Gemini model available via the Gemini API and on OpenRouter. Look for the current flagship model name.
-- **Perplexity**: Search for the latest Perplexity Sonar models available on OpenRouter. Note that Perplexity uses distinct model names for web vs. non-web (e.g. `sonar` vs. `sonar-reasoning`), NOT the `:online` suffix convention.
+- **Kimi**: Search for the latest Moonshot Kimi model available on OpenRouter. Look for the current flagship model name.
 
 Prefer stable/GA releases over preview or experimental models unless the user explicitly requests otherwise.
 
@@ -65,7 +71,7 @@ When determining the correct config values, follow these naming conventions:
 |----------|--------------|------------------------|----------------------|
 | OpenAI | Bare model name (e.g. `gpt-5.2`) | `openai/<model>` (e.g. `openai/gpt-5.2`) | `openai/<model>:online` (e.g. `openai/gpt-5.2:online`) |
 | Gemini | Bare model name (e.g. `gemini-3.1-pro`) | `google/<model>` (e.g. `google/gemini-3.1-pro`) | `google/<model>:online` (e.g. `google/gemini-3.1-pro:online`) |
-| Perplexity | `perplexity/<model>` (e.g. `perplexity/sonar`) | `perplexity/<non-web-model>` (e.g. `perplexity/sonar`) | `perplexity/<web-model>` (e.g. `perplexity/sonar-reasoning`) — a **different model name**, NOT `:online` |
+| Kimi | Bare model name (e.g. `kimi-k2.5`) | `moonshotai/<model>` (e.g. `moonshotai/kimi-k2.5`) | `moonshotai/<model>` (same — no `:online` variant) |
 
 ### 5. Present Comparison
 
@@ -79,9 +85,9 @@ Show a comparison table of current vs. latest versions:
 | Gemini | `model` | ... | ... | ... |
 | Gemini | `openrouter_model.none` | ... | ... | ... |
 | Gemini | `openrouter_model.web` | ... | ... | ... |
-| Perplexity | `model` | ... | ... | ... |
-| Perplexity | `openrouter_model.none` | ... | ... | ... |
-| Perplexity | `openrouter_model.web` | ... | ... | ... |
+| Kimi | `model` | ... | ... | ... |
+| Kimi | `openrouter_model.none` | ... | ... | ... |
+| Kimi | `openrouter_model.web` | ... | ... | ... |
 
 If running in **`check` mode**, stop here — display the table and exit without making changes.
 
@@ -93,10 +99,13 @@ Before applying any changes, clearly list what will be modified and ask the user
 
 ### 7. Update Configuration
 
+Determine the target file based on the `--local` flag:
+
+- **Default (global)**: Write to `${CLAUDE_PLUGIN_ROOT}/consensus_config.json`
+- **`--local`**: Write to `./consensus_config.json`. If it doesn't exist, copy the full template from `${CLAUDE_PLUGIN_ROOT}/consensus_config.json` first, then apply model updates on top.
+
 Apply changes following these rules:
 
-- **Always write to `./consensus_config.json`** (project-local), never modify the plugin template
-- If `./consensus_config.json` does not exist, copy the full template from `${CLAUDE_PLUGIN_ROOT}/consensus_config.json` first, then apply model updates on top
 - **Only modify model-related fields**: `model`, `openrouter_model.none`, `openrouter_model.web`
 - **Never touch**: `api_keys`, `enabled`, `use_openrouter`, `endpoint`, `endpoints`, or `settings`
 - **Preserve `api_keys` as `null`** in the config file — keys come from environment variables
@@ -104,7 +113,7 @@ Apply changes following these rules:
 
 ### 8. Verify
 
-Read back `./consensus_config.json` and display the final model versions to confirm the update was applied correctly.
+Read back the target config file and display the final model versions to confirm the update was applied correctly.
 
 ## Notes
 

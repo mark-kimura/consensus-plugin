@@ -1,17 +1,22 @@
 ---
+description: >
+  When the user wants to cross-check ideas across multiple AI providers — look for phrases like
+  "consensus", "multiple perspectives", "what do other AIs think", "cross-check", "second opinion",
+  "ask other models", or "get diverse perspectives". This skill queries GPT-5.2, Gemini, and Kimi K2.5
+  concurrently via OpenRouter and synthesizes their responses. NOTE: This calls external paid APIs
+  using the user's own API keys, so only trigger when the user clearly intends it.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Glob
   - Grep
-description: Query multiple AI providers concurrently for expert advice with comprehensive prompts
 argument-hint: "[optional: specific focus area or leave empty for context-based]"
 ---
 
 # Consensus — Query Multiple AIs
 
-You will analyze the user's request and current context, craft a comprehensive prompt, then query multiple AI providers concurrently (GPT-5.2, Gemini 3.1 Pro, Perplexity via OpenRouter) and consolidate their responses.
+You will analyze the user's request and current context, craft a comprehensive prompt, then query multiple AI providers concurrently (GPT-5.2, Gemini, and Kimi K2.5 via OpenRouter by default) and consolidate their responses.
 
 Arguments provided: $ARGUMENTS
 
@@ -46,12 +51,14 @@ Save the crafted prompt as `consensus_docs/prompt-{timestamp}.md`.
 
 Run the consensus engine and wait for completion:
 
+Use the `uv_path` from the SessionStart hook output (e.g. `/home/user/.local/bin/uv`). If not available, find it with: `command -v uv || ls ~/.local/bin/uv ~/.cargo/bin/uv /usr/local/bin/uv 2>/dev/null | head -1`
+
 ```bash
 # Default: uses config's default search mode (usually "web")
-uv run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py consensus_docs/prompt-{timestamp}.md --plugin-root "${CLAUDE_PLUGIN_ROOT}"
+<uv_path> run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py consensus_docs/prompt-{timestamp}.md --plugin-root "${CLAUDE_PLUGIN_ROOT}"
 
 # Explicit no-web mode only when requested
-uv run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py consensus_docs/prompt-{timestamp}.md --search-mode none --plugin-root "${CLAUDE_PLUGIN_ROOT}"
+<uv_path> run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py consensus_docs/prompt-{timestamp}.md --search-mode none --plugin-root "${CLAUDE_PLUGIN_ROOT}"
 ```
 
 ### 5. Analyze and Present Consensus
@@ -79,9 +86,9 @@ When $ARGUMENTS is empty, gather context by:
 
 ## AI Providers
 
-Queries these providers concurrently:
+Default providers (via OpenRouter):
 - **OpenAI GPT-5.2**: Responses API with reasoning capabilities
 - **Google Gemini 3.1 Pro**: Large context with thinking capabilities
-- **Perplexity Sonar**: Built-in web search and research capabilities
+- **Moonshot Kimi K2.5**: Multimodal with strong coding and agentic capabilities
 
-Providers with missing API keys are silently skipped. At least one key is required.
+Additional providers can be enabled in `consensus_config.json`. Providers with missing API keys are silently skipped. At least one key is required.

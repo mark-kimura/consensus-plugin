@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Consensus is a Claude Code plugin that queries multiple AI providers (GPT-5.2, Gemini, Perplexity) concurrently via async Python, then synthesizes their responses. It has no build system — pure Python 3.11+ with `uv` for dependency resolution via PEP 723 inline script metadata.
+Consensus is a Claude Code plugin that queries multiple AI providers (GPT-5.2, Gemini, and Kimi K2.5 via OpenRouter by default) concurrently via async Python, then synthesizes their responses. Additional providers can be enabled in config. It has no build system — pure Python 3.11+ with `uv` for dependency resolution via PEP 723 inline script metadata.
 
 ## Running the Core Engine
 
@@ -23,8 +23,7 @@ There are no tests, linter, or build commands. The only runtime dependency is `a
 ### Plugin Components
 
 - **`.claude-plugin/plugin.json`** — Plugin manifest (name: `consensus`, v1.0.0)
-- **`commands/ask.md`** — `/consensus:ask` slash command; orchestrates the full workflow (analyze context → craft prompt → run engine → synthesize results)
-- **`skills/multi-ai-consensus/SKILL.md`** — Auto-triggered skill; detects phrases like "consensus", "second opinion", "cross-check"; same workflow as the command
+- **`skills/ask/SKILL.md`** — `/consensus:ask` skill; orchestrates the full workflow (analyze context → craft prompt → run engine → synthesize results). Also auto-triggers on phrases like "consensus", "second opinion", "cross-check"
 - **`hooks/hooks.json`** — SessionStart hook runs `check-setup.sh` to validate `uv` and API key availability (informational only, never fails)
 - **`consensus_config.json`** — Default configuration template; users can copy to project root to override
 
@@ -42,7 +41,6 @@ Single-file async Python engine (~560 lines). Key flow:
 - `AIProvider` — Abstract base with `name`, `api_key`, `available`, `config`
 - `OpenAIProvider` — Direct API; GPT-5.2 uses Responses API with reasoning effort levels, older models use chat completions
 - `GeminiProvider` — Direct Gemini API with exponential backoff retry (3 retries, 1s→2s→4s); 32768 token limit
-- `PerplexityProvider` — Always via OpenRouter; web mode uses `sonar-reasoning`, none mode uses `sonar`
 - `OpenRouterProvider` — Generic OpenRouter proxy; model selected by search mode from `openrouter_model` config map; adds web plugin when model doesn't end with `:online`
 
 ### Search Modes
@@ -52,8 +50,8 @@ Single-file async Python engine (~560 lines). Key flow:
 
 ### Key Environment Variables
 
-- `OPENAI_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY` — At least one required
-- `PERPLEXITY_API_KEY` — Fallback alias for `OPENROUTER_API_KEY`
+- `OPENROUTER_API_KEY` — Routes GPT-5.2 and Gemini by default; only key needed for default setup
+- `OPENAI_API_KEY`, `GEMINI_API_KEY` — Optional; for direct API access when `use_openrouter` is false
 - `CLAUDE_PLUGIN_ROOT` — Injected by Claude Code; used in command/skill markdown templates
 
 ## Conventions

@@ -5,9 +5,35 @@
 
 set -euo pipefail
 
+# Resolve uv binary — check PATH, then common install locations, then `which`/`find`
 uv_ok="false"
+uv_path=""
 uv_msg=""
-if command -v uv &>/dev/null; then
+
+find_uv() {
+  # 1. Already in PATH
+  if command -v uv &>/dev/null; then
+    uv_path="$(command -v uv)"
+    return 0
+  fi
+  # 2. Common install locations
+  for candidate in "$HOME/.local/bin/uv" "$HOME/.cargo/bin/uv" /usr/local/bin/uv /opt/homebrew/bin/uv; do
+    if [ -x "$candidate" ]; then
+      uv_path="$candidate"
+      return 0
+    fi
+  done
+  # 3. Broader search (limited to common dirs, fast)
+  for dir in /usr/bin /usr/local/sbin /snap/bin; do
+    if [ -x "$dir/uv" ]; then
+      uv_path="$dir/uv"
+      return 0
+    fi
+  done
+  return 1
+}
+
+if find_uv; then
   uv_ok="true"
 else
   uv_msg="uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
@@ -54,6 +80,7 @@ count=0
 cat <<EOF
 {
   "uv_available": $uv_ok,
+  "uv_path": "$uv_path",
   "uv_message": "$uv_msg",
   "api_keys": { $openai_status, $gemini_status, $openrouter_status },
   "providers_available": $count,
@@ -63,7 +90,7 @@ EOF
 
 # Print human-readable status
 if [ "$uv_ok" = "true" ]; then
-  echo "[Consensus] uv: ready" >&2
+  echo "[Consensus] uv: $uv_path" >&2
 else
   echo "[Consensus] WARNING: $uv_msg" >&2
 fi

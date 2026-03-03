@@ -4,7 +4,7 @@ Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, etc.) for divers
 
 ## How It Works
 
-When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5.2, Gemini 3.1 Pro, and Perplexity — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
+When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5.2 and Gemini 3.1 Pro by default — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
 
 ## Installation
 
@@ -19,9 +19,9 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Set one or more of these environment variables (you only need the providers you want to use):
 
 ```bash
-export OPENAI_API_KEY="sk-..."          # OpenAI API (GPT-5.2)
-export GEMINI_API_KEY="AI..."           # Google Gemini API
-export OPENROUTER_API_KEY="sk-or-..."   # OpenRouter (Perplexity, or any provider)
+export OPENROUTER_API_KEY="sk-or-..."   # OpenRouter — routes GPT-5.2 and Gemini (recommended)
+export OPENAI_API_KEY="sk-..."          # OpenAI direct API (optional, if not using OpenRouter)
+export GEMINI_API_KEY="AI..."           # Google Gemini direct API (optional, if not using OpenRouter)
 ```
 
 Add them to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across sessions.
@@ -101,7 +101,7 @@ The plugin works out of the box with environment variables. For advanced configu
 |---|---|---|
 | `OPENAI_API_KEY` | OpenAI GPT-5.2 | Direct API access |
 | `GEMINI_API_KEY` | Google Gemini | Direct API access |
-| `OPENROUTER_API_KEY` | OpenRouter | Proxies Perplexity, Gemini, and others |
+| `OPENROUTER_API_KEY` | OpenRouter | Routes GPT-5.2, Gemini, and others (recommended) |
 
 - Keys are **never** stored in plugin files
 - Providers with missing keys are silently skipped
