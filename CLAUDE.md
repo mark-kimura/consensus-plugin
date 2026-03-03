@@ -31,7 +31,7 @@ There are no tests, linter, or build commands. The only runtime dependency is `a
 
 Single-file async Python engine (~560 lines). Key flow:
 
-1. `load_config()` — 4-tier config resolution: CLI `--config` → `./consensus_config.json` → `<plugin-root>/consensus_config.json` → built-in `DEFAULT_CONFIG`. Environment variables always override API keys.
+1. `load_config()` — 5-tier config resolution: CLI `--config` → `./consensus_config.json` → `~/.claude/consensus_config.json` → `<plugin-root>/consensus_config.json` → built-in `DEFAULT_CONFIG`. Environment variables always override API keys.
 2. `setup_providers()` — Dynamically initializes providers based on config `enabled`/`use_openrouter` flags and available API keys. Missing keys cause skip, not failure.
 3. `query_all_providers()` — Fires all provider queries concurrently via `asyncio.create_task` + `asyncio.as_completed`.
 4. `consolidate_responses()` — Writes markdown with per-provider sections to a temp directory (or `--output-dir` if specified).

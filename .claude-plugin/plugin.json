@@ -1,6 +1,6 @@
 {
   "name": "consensus",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, etc.) for diverse perspectives",
   "license": "MIT",
   "author": {

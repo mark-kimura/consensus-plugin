@@ -74,11 +74,11 @@ This also auto-triggers when you say things like:
 
 ```
 /consensus:config              # Show current providers (same as check)
-/consensus:config check        # Show current providers
 /consensus:config update       # Update all providers to latest models
 /consensus:config add llama 4  # Add a new provider via OpenRouter
 /consensus:config remove kimi  # Remove a provider
 /consensus:config openai       # Interactively configure OpenAI (model + routing)
+/consensus:config --reset      # Reset all providers to plugin defaults
 ```
 
 ### What Happens
@@ -101,9 +101,10 @@ The plugin works out of the box with just `OPENROUTER_API_KEY`. For advanced con
 
 ### Config Resolution Order
 
-1. `./consensus_config.json` (your project root)
-2. Plugin's built-in `consensus_config.json`
-3. Hardcoded defaults
+1. `./consensus_config.json` (project root — for project-specific overrides)
+2. `~/.claude/consensus_config.json` (user config — written by `/consensus:config`, survives plugin updates)
+3. Plugin's built-in `consensus_config.json`
+4. Hardcoded defaults
 
 ## Search Modes
 

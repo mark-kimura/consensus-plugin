@@ -103,8 +103,9 @@ def load_config(config_path: Optional[str] = None, plugin_root: Optional[str] = 
     """Load configuration with resolution order:
     1. Explicit --config path
     2. ./consensus_config.json (project-local)
-    3. <plugin_root>/consensus_config.json (plugin default)
-    4. Built-in DEFAULT_CONFIG
+    3. ~/.claude/consensus_config.json (user config)
+    4. <plugin_root>/consensus_config.json (plugin default)
+    5. Built-in DEFAULT_CONFIG
     """
     config = None
 
@@ -117,6 +118,13 @@ def load_config(config_path: Optional[str] = None, plugin_root: Optional[str] = 
     if config is None and os.path.exists("consensus_config.json"):
         with open("consensus_config.json", "r", encoding="utf-8") as f:
             config = _deep_merge(DEFAULT_CONFIG, json.load(f))
+
+    # Try user config
+    if config is None:
+        user_cfg = os.path.join(os.path.expanduser("~"), ".claude", "consensus_config.json")
+        if os.path.exists(user_cfg):
+            with open(user_cfg, "r", encoding="utf-8") as f:
+                config = _deep_merge(DEFAULT_CONFIG, json.load(f))
 
     # Try plugin root
     if config is None and plugin_root:

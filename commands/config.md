@@ -6,7 +6,7 @@ allowed-tools:
   - Bash
   - Glob
 description: Manage provider configuration — check status, update models, add/remove/configure providers
-argument-hint: "[check|update|add <model>|remove <provider>|<provider>] [--local]"
+argument-hint: "[check|update|add <model>|remove <provider>|<provider>] [--reset]"
 ---
 
 # Consensus — Provider Configuration
@@ -28,9 +28,10 @@ Parse `$ARGUMENTS` to determine the subcommand and target:
 - **`remove <provider>`** — Remove an existing provider
 - **`<provider>`** — Interactive configuration for an existing provider (e.g. `openai`, `gemini`, `kimi`). Detected when the first argument matches an existing provider key in config and is not one of the subcommand keywords above.
 
-**Target flag (applies to all subcommands):**
-- **`--local`** — Operate on `./consensus_config.json` (current project). Creates it from the plugin template if it doesn't exist.
-- **Default (no flag)** — Operate on the plugin template at `${CLAUDE_PLUGIN_ROOT}/consensus_config.json` (affects all projects that don't have a local override)
+**Flags:**
+- **`--reset`** — Reset the provider (or all providers) back to plugin defaults by removing customizations from the user config file
+
+**Config file location:** All customizations are written to `~/.claude/consensus_config.json`. This file survives plugin updates. The plugin template at `${CLAUDE_PLUGIN_ROOT}/consensus_config.json` is never modified by this command.
 
 ### 2. Route to Subcommand
 
@@ -44,10 +45,12 @@ Display the current provider configuration in a table.
 
 ### Read Current Configuration
 
-Load the active configuration:
+Load the effective configuration by reading in resolution order:
 
-1. If `--local`: read `./consensus_config.json` (report if missing)
-2. Otherwise: read `${CLAUDE_PLUGIN_ROOT}/consensus_config.json`
+1. `~/.claude/consensus_config.json` (user customizations, if exists)
+2. `${CLAUDE_PLUGIN_ROOT}/consensus_config.json` (plugin defaults)
+
+If a user config exists, note which providers have been customized vs. using defaults.
 
 ### Display Provider Table
 
@@ -72,12 +75,7 @@ Check and update model versions, searching for the latest available models.
 
 ### Read Current Configuration
 
-Load the active configuration:
-
-1. Check for a project-local config at `./consensus_config.json`
-2. If not found, fall back to the plugin template at `${CLAUDE_PLUGIN_ROOT}/consensus_config.json`
-
-Display the current model versions in a table:
+Load the effective configuration (user config merged over plugin defaults). Display the current model versions in a table:
 
 | Provider | Field | Current Value |
 |----------|-------|---------------|
@@ -127,16 +125,13 @@ Before applying any changes, clearly list what will be modified and ask the user
 
 ### Update Configuration
 
-Determine the target file based on the `--local` flag:
-
-- **Default (global)**: Write to `${CLAUDE_PLUGIN_ROOT}/consensus_config.json`
-- **`--local`**: Write to `./consensus_config.json`. If it doesn't exist, copy the full template from `${CLAUDE_PLUGIN_ROOT}/consensus_config.json` first, then apply model updates on top.
+Write changes to `~/.claude/consensus_config.json`. If the file doesn't exist yet, create it with only the changed provider entries (no need to copy the full template — `_deep_merge` handles defaults at runtime).
 
 Apply changes following these rules:
 
 - **Only modify model-related fields**: `model`, `openrouter_model.none`, `openrouter_model.web`
 - **Never touch**: `api_keys`, `enabled`, `use_openrouter`, `endpoint`, `endpoints`, or `settings`
-- **Preserve `api_keys` as `null`** in the config file — keys come from environment variables
+- **Never include `api_keys`** in the user config file — keys come from environment variables
 - **Write format**: 2-space JSON indentation with a trailing newline
 
 ### Verify
@@ -192,14 +187,14 @@ If no `:online` variant exists, set `web` to the same value as `none` (same patt
 Present the proposed config entry clearly and ask for confirmation before writing. Show:
 - Provider key name
 - Full config entry that will be added
-- Which config file will be modified
+- Target file: `~/.claude/consensus_config.json`
 
 ### Write to Config
 
-1. Read the target config file (based on `--local` flag)
+1. Read `~/.claude/consensus_config.json` (create if it doesn't exist)
 2. Add the new provider entry under `providers`
 3. Write back with 2-space JSON indentation and trailing newline
-4. **Preserve `api_keys` as `null`** — never write actual key values
+4. **Never include `api_keys`** in the user config file — keys come from environment variables
 
 ### Verify
 
@@ -237,10 +232,11 @@ Show the provider that will be removed, including its full config entry, and ask
 
 ### Remove from Config
 
-1. Read the target config file (based on `--local` flag)
-2. Delete the provider entry entirely from `providers`
-3. Write back with 2-space JSON indentation and trailing newline
-4. **Preserve `api_keys` as `null`** — never write actual key values
+1. Read `~/.claude/consensus_config.json` (if it doesn't exist, create it)
+2. To remove a provider that was **added by the user** (exists in user config): delete the entry entirely
+3. To remove a provider that comes from **plugin defaults** (openai, gemini, kimi): add an entry with `"enabled": false` to the user config to override the default
+4. Write back with 2-space JSON indentation and trailing newline
+5. **Never include `api_keys`** in the user config file — keys come from environment variables
 
 ### Verify
 
@@ -295,16 +291,26 @@ Based on the user's choices, update the provider config entry:
 
 Present the full updated config entry and ask for confirmation. Then:
 
-1. Read the target config file (based on `--local` flag)
+1. Read `~/.claude/consensus_config.json` (create if it doesn't exist)
 2. Update the provider entry under `providers`
 3. Write back with 2-space JSON indentation and trailing newline
-4. **Preserve `api_keys` as `null`** — never write actual key values
+4. **Never include `api_keys`** in the user config file — keys come from environment variables
 
 ### Verify
 
 Read back the config file and display the updated provider settings to confirm.
 
 ---
+
+## `--reset` Flag
+
+When `--reset` is passed, revert customizations back to plugin defaults:
+
+- **`/consensus:config --reset`** — Delete `~/.claude/consensus_config.json` entirely. All providers revert to plugin defaults.
+- **`/consensus:config openai --reset`** — Remove only the `openai` entry from `~/.claude/consensus_config.json`. That provider reverts to plugin defaults while other customizations are preserved.
+- **`/consensus:config remove deepseek --reset`** — Same as `remove deepseek`: if the provider was user-added, remove it from the user config.
+
+Before resetting, show what will change (current customized values → default values) and confirm with the user.
 
 ## Notes
 
@@ -313,3 +319,5 @@ Read back the config file and display the updated provider settings to confirm.
 - When multiple stable versions exist, prefer the newest stable release.
 - The `check` subcommand is always safe — it never modifies any files.
 - For `add`, the provider is always configured with `use_openrouter: true` since we're discovering it via OpenRouter.
+- All customizations live in `~/.claude/consensus_config.json`. The plugin template is never modified by this command.
+- The engine merges the user config over plugin defaults at runtime via `_deep_merge()`, so the user config only needs to contain the fields that differ from defaults.
