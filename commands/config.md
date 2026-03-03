@@ -5,8 +5,8 @@ allowed-tools:
   - Write
   - Bash
   - Glob
-description: Manage provider configuration — check status, update models, add/remove providers
-argument-hint: "[check|update|add <model>|remove <provider>] [--local]"
+description: Manage provider configuration — check status, update models, add/remove/configure providers
+argument-hint: "[check|update|add <model>|remove <provider>|<provider>] [--local]"
 ---
 
 # Consensus — Provider Configuration
@@ -26,6 +26,7 @@ Parse `$ARGUMENTS` to determine the subcommand and target:
 - **`update [provider]`** — Update models to latest versions (existing behavior)
 - **`add <model>`** — Add a new provider via OpenRouter
 - **`remove <provider>`** — Remove an existing provider
+- **`<provider>`** — Interactive configuration for an existing provider (e.g. `openai`, `gemini`, `kimi`). Detected when the first argument matches an existing provider key in config and is not one of the subcommand keywords above.
 
 **Target flag (applies to all subcommands):**
 - **`--local`** — Operate on `./consensus_config.json` (current project). Creates it from the plugin template if it doesn't exist.
@@ -244,6 +245,64 @@ Show the provider that will be removed, including its full config entry, and ask
 ### Verify
 
 Read back the config file and display the updated provider table to confirm the removal.
+
+---
+
+## Subcommand: `<provider>` (Interactive Provider Config)
+
+Interactively configure an existing provider — choose the model and routing method.
+
+Triggered when `$ARGUMENTS` starts with an existing provider key (e.g. `openai`, `gemini`, `kimi`) that isn't one of the keyword subcommands (`check`, `update`, `add`, `remove`).
+
+### Show Current Config
+
+Read the active config and display the current settings for this provider:
+
+- **Provider key**: (e.g. `openai`)
+- **Enabled**: yes/no
+- **Routing**: OpenRouter / Direct API
+- **Model**: (current model name)
+- **OpenRouter model (none)**: (value)
+- **OpenRouter model (web)**: (value)
+
+### Ask: Routing
+
+Ask the user how they want to route this provider:
+
+1. **OpenRouter** (recommended) — Routes through OpenRouter. Only needs `OPENROUTER_API_KEY`.
+2. **Direct API** — Calls the provider's API directly. Needs the provider-specific key (e.g. `OPENAI_API_KEY`, `GEMINI_API_KEY`).
+
+If the user picks Direct API, check if the corresponding environment variable is set. If not, warn them which key they'll need to set (but do not block — they may set it later).
+
+### Ask: Model
+
+Search for available models for this provider and present choices:
+
+1. Use WebSearch to find the latest models available for this provider (on OpenRouter if routing via OpenRouter, or via the provider's own API if direct).
+2. Present the top 2–3 model options to the user. Include the current model as one of the choices (marked as current). Prefer stable/GA releases.
+3. Let the user pick, or type a custom model name.
+
+### Build Updated Config
+
+Based on the user's choices, update the provider config entry:
+
+- Set `use_openrouter` to `true` or `false` based on routing choice
+- Set `model` to the bare model name
+- Set `openrouter_model.none` and `openrouter_model.web` following the naming conventions (see Model ID Convention Reference in the `update` section)
+- If no `:online` variant exists for the chosen model, set `web` to the same value as `none`
+
+### Confirm and Write
+
+Present the full updated config entry and ask for confirmation. Then:
+
+1. Read the target config file (based on `--local` flag)
+2. Update the provider entry under `providers`
+3. Write back with 2-space JSON indentation and trailing newline
+4. **Preserve `api_keys` as `null`** — never write actual key values
+
+### Verify
+
+Read back the config file and display the updated provider settings to confirm.
 
 ---
 

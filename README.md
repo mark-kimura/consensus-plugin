@@ -78,6 +78,7 @@ This also auto-triggers when you say things like:
 /consensus:config update       # Update all providers to latest models
 /consensus:config add llama 4  # Add a new provider via OpenRouter
 /consensus:config remove kimi  # Remove a provider
+/consensus:config openai       # Interactively configure OpenAI (model + routing)
 ```
 
 ### What Happens
