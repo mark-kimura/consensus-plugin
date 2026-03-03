@@ -1,16 +1,21 @@
 {
   "name": "consensus-marketplace",
+  "description": "Marketplace for the Consensus multi-AI plugin",
   "owner": {
     "name": "Mark Kimura"
-  },
-  "metadata": {
-    "description": "Marketplace for the Consensus multi-AI plugin"
   },
   "plugins": [
     {
       "name": "consensus",
-      "source": "./",
-      "description": "Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, Kimi K2.5) concurrently"
+      "description": "Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, Kimi K2.5) concurrently",
+      "version": "1.3.0",
+      "author": {
+        "name": "Mark Kimura"
+      },
+      "source": {
+        "source": "github",
+        "repo": "mark-kimura/consensus-plugin"
+      }
     }
   ]
 }
