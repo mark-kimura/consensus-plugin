@@ -36,7 +36,6 @@
     }
   },
   "settings": {
-    "default_output_dir": "consensus_docs",
     "default_search_mode": "web",
     "max_tokens": 4000,
     "max_tokens_gemini": 32768,

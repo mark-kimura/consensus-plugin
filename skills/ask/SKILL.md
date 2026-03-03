@@ -39,31 +39,30 @@ Create a detailed prompt including:
 - **Decision criteria** (performance vs simplicity, short-term vs long-term, etc.)
 - **Response requirements**: Providers must give direct answers — no follow-up questions allowed. If information is incomplete, they should state assumptions and proceed.
 
-### 3. Save Prompt to File
+### 3. Save Prompt and Execute
 
-```bash
-mkdir -p consensus_docs
-```
-
-Save the crafted prompt as `consensus_docs/prompt-{timestamp}.md`.
-
-### 4. Execute Concurrent Queries
-
-Run the consensus engine and wait for completion:
+Save the prompt to a temp file and run the consensus engine:
 
 Use the `uv_path` from the SessionStart hook output (e.g. `/home/user/.local/bin/uv`). If not available, find it with: `command -v uv || ls ~/.local/bin/uv ~/.cargo/bin/uv /usr/local/bin/uv 2>/dev/null | head -1`
 
 ```bash
+PROMPT_FILE=$(mktemp /tmp/consensus-prompt-XXXXXX.md)
+cat > "$PROMPT_FILE" << 'PROMPT_EOF'
+<your crafted prompt here>
+PROMPT_EOF
+
 # Default: uses config's default search mode (usually "web")
-<uv_path> run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py consensus_docs/prompt-{timestamp}.md --plugin-root "${CLAUDE_PLUGIN_ROOT}"
+<uv_path> run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py "$PROMPT_FILE" --plugin-root "${CLAUDE_PLUGIN_ROOT}"
 
 # Explicit no-web mode only when requested
-<uv_path> run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py consensus_docs/prompt-{timestamp}.md --search-mode none --plugin-root "${CLAUDE_PLUGIN_ROOT}"
+<uv_path> run ${CLAUDE_PLUGIN_ROOT}/scripts/consensus.py "$PROMPT_FILE" --search-mode none --plugin-root "${CLAUDE_PLUGIN_ROOT}"
 ```
 
-### 5. Analyze and Present Consensus
+The engine prints `Output saved to: <path>` — use that path in the next step.
 
-Read the output file `consensus_docs/consolidated-{timestamp}.md` and synthesize findings:
+### 4. Analyze and Present Consensus
+
+Read the output file from the path printed by the engine and synthesize findings:
 
 - **Common themes**: Areas where multiple providers agree
 - **Unique perspectives**: Insights mentioned by only one provider

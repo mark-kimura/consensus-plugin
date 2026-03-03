@@ -75,10 +75,11 @@ The plugin also triggers when you say things like:
 
 1. Claude Code analyzes your request and conversation context
 2. Crafts a comprehensive prompt with technical details
-3. Saves the prompt to `consensus_docs/`
-4. Queries all available providers concurrently
-5. Reads the consolidated responses
-6. Synthesizes findings: agreements, unique perspectives, and takeaways
+3. Queries all available providers concurrently
+4. Reads the consolidated responses
+5. Synthesizes findings: agreements, unique perspectives, and takeaways
+
+All intermediate files (prompts, raw responses) go to a temp directory — nothing is written to your project.
 
 ## Configuration
 
@@ -120,11 +121,10 @@ consensus-plugin/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest
 ├── commands/
-│   ├── ask.md                   # /consensus:ask command
 │   └── update.md                # /consensus:update command
 ├── skills/
-│   └── multi-ai-consensus/
-│       └── SKILL.md             # Auto-triggered skill
+│   └── ask/
+│       └── SKILL.md             # /consensus:ask skill (also auto-triggers)
 ├── hooks/
 │   └── hooks.json               # SessionStart: checks API keys + uv
 ├── scripts/

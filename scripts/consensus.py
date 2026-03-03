@@ -17,6 +17,7 @@ Setup:
 
 Usage:
   uv run consensus.py <markdown_file> [--search-mode {web|none}] [--output-dir DIR] [--config CONFIG] [--plugin-root DIR]
+  Output goes to a temp directory by default. Use --output-dir to persist files.
 """
 
 import sys
@@ -26,6 +27,7 @@ import asyncio
 import aiohttp
 import json
 import time
+import tempfile
 from datetime import datetime
 from typing import List, Dict, Optional
 
@@ -72,7 +74,6 @@ DEFAULT_CONFIG = {
         },
     },
     "settings": {
-        "default_output_dir": "consensus_docs",
         "default_search_mode": "web",
         "max_tokens": 32768,
         "max_tokens_gemini": 32768,
@@ -454,7 +455,7 @@ async def main():
     parser = argparse.ArgumentParser(description="Query multiple AI providers concurrently")
     parser.add_argument("markdown_file", help="Path to the markdown file containing the prompt")
     parser.add_argument("--search-mode", choices=["web", "none"], help="Search mode: web or none")
-    parser.add_argument("--output-dir", help="Output directory for responses")
+    parser.add_argument("--output-dir", default=None, help="Output directory for responses (default: temp directory)")
     parser.add_argument("--config", default=None, help="Path to configuration file")
     parser.add_argument("--plugin-root", default=None, help="Path to plugin root directory")
 
@@ -464,8 +465,6 @@ async def main():
 
     if not args.search_mode:
         args.search_mode = config["settings"]["default_search_mode"]
-    if not args.output_dir:
-        args.output_dir = config["settings"]["default_output_dir"]
 
     if not os.path.exists(args.markdown_file):
         print(f"Error: File '{args.markdown_file}' not found")
@@ -496,9 +495,14 @@ async def main():
 
     consolidated = consolidate_responses(responses, prompt)
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    # Use explicit output dir if provided, otherwise use temp directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_file = os.path.join(args.output_dir, f"consolidated-{timestamp}.md")
+    if args.output_dir:
+        os.makedirs(args.output_dir, exist_ok=True)
+        output_file = os.path.join(args.output_dir, f"consolidated-{timestamp}.md")
+    else:
+        tmp_dir = tempfile.mkdtemp(prefix="consensus-")
+        output_file = os.path.join(tmp_dir, f"consolidated-{timestamp}.md")
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(consolidated)
