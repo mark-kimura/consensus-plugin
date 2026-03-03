@@ -1,10 +1,10 @@
 # Consensus — Multi-AI Provider Plugin for Claude Code
 
-Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, etc.) for diverse perspectives, right from within Claude Code.
+Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, Kimi K2.5) for diverse perspectives, right from within Claude Code.
 
 ## How It Works
 
-When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5.2 and Gemini 3.1 Pro by default — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
+When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5.2, Gemini 3.1 Pro, and Kimi K2.5 via OpenRouter by default — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
 
 ## Installation
 
@@ -16,20 +16,28 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ### 2. Set API Keys
 
-Set one or more of these environment variables (you only need the providers you want to use):
+Only one key is needed for the default setup:
 
 ```bash
-export OPENROUTER_API_KEY="sk-or-..."   # OpenRouter — routes GPT-5.2 and Gemini (recommended)
-export OPENAI_API_KEY="sk-..."          # OpenAI direct API (optional, if not using OpenRouter)
-export GEMINI_API_KEY="AI..."           # Google Gemini direct API (optional, if not using OpenRouter)
+export OPENROUTER_API_KEY="sk-or-..."   # Routes all three default providers
+```
+
+Optional, for direct API access (bypassing OpenRouter):
+
+```bash
+export OPENAI_API_KEY="sk-..."          # OpenAI direct API
+export GEMINI_API_KEY="AI..."           # Google Gemini direct API
 ```
 
 Add them to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across sessions.
 
 ### 3. Install the Plugin
 
-```bash
-claude plugin add /path/to/consensus-plugin
+In Claude Code, run these two commands:
+
+```
+/plugin marketplace add mark-kimura/consensus-plugin
+/plugin install consensus@consensus-marketplace
 ```
 
 ### 4. Enable Auto-Update (Recommended)
@@ -38,28 +46,31 @@ By default, third-party plugins don't auto-update. To get new versions automatic
 
 1. Run `/plugin` in Claude Code
 2. Go to **Marketplaces**
-3. Select the consensus marketplace
+3. Select **consensus-marketplace**
 4. Choose **Enable auto-update**
 
-Without this, you'll need to run `claude plugin update consensus@<marketplace>` manually after each release.
+Without this, you'll need to run `/plugin update consensus@consensus-marketplace` manually after each release.
 
 ## Usage
 
-### Slash Commands
-
-**Ask for consensus:**
+### `/consensus:ask`
 
 ```
 /consensus:ask help me optimize the SSE connection handling
 ```
 
-Or without arguments (Claude infers from conversation context):
+Or without arguments — Claude infers from conversation context:
 
 ```
 /consensus:ask
 ```
 
-**Update provider models:**
+This also auto-triggers when you say things like:
+- "What do other AIs think about this approach?"
+- "Can I get a consensus on this?"
+- "Cross-check this with other models"
+
+### `/consensus:update`
 
 ```
 /consensus:update              # Update all providers to latest models
@@ -67,28 +78,18 @@ Or without arguments (Claude infers from conversation context):
 /consensus:update check        # Dry-run: show current vs. latest without changes
 ```
 
-### Natural Language (Skill)
-
-The plugin also triggers when you say things like:
-
-- "What do other AIs think about this approach?"
-- "Can I get a consensus on this?"
-- "Cross-check this with other models"
-- "I want multiple perspectives on this"
-
 ### What Happens
 
-1. Claude Code analyzes your request and conversation context
+1. Claude analyzes your request and conversation context
 2. Crafts a comprehensive prompt with technical details
 3. Queries all available providers concurrently
-4. Reads the consolidated responses
-5. Synthesizes findings: agreements, unique perspectives, and takeaways
+4. Synthesizes findings: agreements, unique perspectives, and takeaways
 
-All intermediate files (prompts, raw responses) go to a temp directory — nothing is written to your project.
+All intermediate files go to a temp directory — nothing is written to your project.
 
 ## Configuration
 
-The plugin works out of the box with environment variables. For advanced configuration, copy `consensus_config.json` to your project root and customize:
+The plugin works out of the box with just `OPENROUTER_API_KEY`. For advanced configuration, copy `consensus_config.json` to your project root and customize:
 
 - **Provider routing**: Toggle `use_openrouter` per provider to route through OpenRouter or call APIs directly
 - **Models**: Change which model each provider uses
@@ -101,19 +102,6 @@ The plugin works out of the box with environment variables. For advanced configu
 2. Plugin's built-in `consensus_config.json`
 3. Hardcoded defaults
 
-## API Key Management
-
-| Variable | Provider | Notes |
-|---|---|---|
-| `OPENAI_API_KEY` | OpenAI GPT-5.2 | Direct API access |
-| `GEMINI_API_KEY` | Google Gemini | Direct API access |
-| `OPENROUTER_API_KEY` | OpenRouter | Routes GPT-5.2, Gemini, and others (recommended) |
-
-- Keys are **never** stored in plugin files
-- Providers with missing keys are silently skipped
-- Having just **one** key is enough
-- The SessionStart hook reports which providers are available
-
 ## Search Modes
 
 - **`web`** (default): Providers include current web information. Good for recent technologies.
@@ -124,7 +112,8 @@ The plugin works out of the box with environment variables. For advanced configu
 ```
 consensus-plugin/
 ├── .claude-plugin/
-│   └── plugin.json              # Plugin manifest
+│   ├── plugin.json              # Plugin manifest
+│   └── marketplace.json         # Marketplace catalog
 ├── commands/
 │   └── update.md                # /consensus:update command
 ├── skills/
@@ -144,7 +133,7 @@ consensus-plugin/
 ## Requirements
 
 - [uv](https://docs.astral.sh/uv/) — auto-installs Python dependencies on first run
-- At least one API key (OpenAI, Gemini, or OpenRouter)
+- At least one API key (`OPENROUTER_API_KEY` recommended)
 - Claude Code
 
 ## License
