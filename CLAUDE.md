@@ -64,9 +64,16 @@ The plugin is installed via a marketplace that points to the GitHub repo. Claude
 2. Commit the version bump together with your changes
 3. Push to GitHub
 
-The user then runs `claude plugin update consensus@consensus-marketplace` to pick up the new version. Auto-update is disabled by default for third-party marketplaces — users must enable it via `/plugin` → Marketplaces → Enable auto-update.
+The user then runs `/plugin update consensus@kahidreamers-marketplace` to pick up the new version. Auto-update is disabled by default for third-party marketplaces — users must enable it via `/plugin` → Marketplaces → Enable auto-update.
 
 **Do not** commit and push without bumping the version — the cached copy will be served and changes will be invisible.
+
+### Marketplace
+
+The marketplace is a separate repo: `mark-kimura/kahidreamers-marketplace`. When bumping the plugin version, also update the `version` field in the marketplace's `.claude-plugin/marketplace.json` and push both repos.
+
+- The marketplace plugin source must use the explicit object format `{"source": "github", "repo": "..."}` — the string shorthand `"./"` silently fails to register
+- Both repos must be **public** for other users to install
 
 ## Conventions
 

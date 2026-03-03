@@ -36,8 +36,8 @@ Add them to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across
 In Claude Code, run these two commands:
 
 ```
-/plugin marketplace add mark-kimura/consensus-plugin
-/plugin install consensus@consensus-marketplace
+/plugin marketplace add mark-kimura/kahidreamers-marketplace
+/plugin install consensus@kahidreamers-marketplace
 ```
 
 ### 4. Enable Auto-Update (Recommended)
@@ -46,10 +46,10 @@ By default, third-party plugins don't auto-update. To get new versions automatic
 
 1. Run `/plugin` in Claude Code
 2. Go to **Marketplaces**
-3. Select **consensus-marketplace**
+3. Select **kahidreamers-marketplace**
 4. Choose **Enable auto-update**
 
-Without this, you'll need to run `/plugin update consensus@consensus-marketplace` manually after each release.
+Without this, you'll need to run `/plugin update consensus@kahidreamers-marketplace` manually after each release.
 
 ## Usage
 
@@ -112,8 +112,7 @@ The plugin works out of the box with just `OPENROUTER_API_KEY`. For advanced con
 ```
 consensus-plugin/
 ├── .claude-plugin/
-│   ├── plugin.json              # Plugin manifest
-│   └── marketplace.json         # Marketplace catalog
+│   └── plugin.json              # Plugin manifest
 ├── commands/
 │   └── update.md                # /consensus:update command
 ├── skills/
