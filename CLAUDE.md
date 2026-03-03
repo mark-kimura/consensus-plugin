@@ -22,7 +22,7 @@ There are no tests, linter, or build commands. The only runtime dependency is `a
 
 ### Plugin Components
 
-- **`.claude-plugin/plugin.json`** — Plugin manifest (name: `consensus`, v1.0.0)
+- **`.claude-plugin/plugin.json`** — Plugin manifest (name: `consensus`)
 - **`skills/ask/SKILL.md`** — `/consensus:ask` skill; orchestrates the full workflow (analyze context → craft prompt → run engine → synthesize results). Also auto-triggers on phrases like "consensus", "second opinion", "cross-check"
 - **`hooks/hooks.json`** — SessionStart hook runs `check-setup.sh` to validate `uv` and API key availability (informational only, never fails)
 - **`consensus_config.json`** — Default configuration template; users can copy to project root to override
@@ -53,6 +53,20 @@ Single-file async Python engine (~560 lines). Key flow:
 - `OPENROUTER_API_KEY` — Routes GPT-5.2 and Gemini by default; only key needed for default setup
 - `OPENAI_API_KEY`, `GEMINI_API_KEY` — Optional; for direct API access when `use_openrouter` is false
 - `CLAUDE_PLUGIN_ROOT` — Injected by Claude Code; used in command/skill markdown templates
+
+## Deploying Changes
+
+The plugin is installed via a marketplace that points to the GitHub repo. Claude Code caches the plugin by version, so pushing code alone is not enough — users won't see changes until the version changes.
+
+**Every time you make changes, you must:**
+
+1. Bump the `version` in `.claude-plugin/plugin.json` (semver: patch for fixes, minor for features)
+2. Commit the version bump together with your changes
+3. Push to GitHub
+
+The user then runs `claude plugin update consensus@consensus-marketplace` (or it auto-updates if enabled).
+
+**Do not** commit and push without bumping the version — the cached copy will be served and changes will be invisible.
 
 ## Conventions
 
