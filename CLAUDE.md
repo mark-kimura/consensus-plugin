@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Consensus is a Claude Code plugin that queries multiple AI providers (GPT-5.2, Gemini, and Kimi K2.5 via OpenRouter by default) concurrently via async Python, then synthesizes their responses. Additional providers can be enabled in config. It has no build system — pure Python 3.11+ with `uv` for dependency resolution via PEP 723 inline script metadata.
+Consensus is a Claude Code plugin that queries multiple AI providers (GPT-5.2, Gemini, and DeepSeek V3.2 via OpenRouter by default) concurrently via async Python, then synthesizes their responses. Additional providers can be enabled in config. It has no build system — pure Python 3.11+ with `uv` for dependency resolution via PEP 723 inline script metadata.
 
 ## Running the Core Engine
 

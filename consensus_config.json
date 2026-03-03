@@ -25,13 +25,13 @@
         "web": "google/gemini-3.1-pro-preview:online"
       }
     },
-    "kimi": {
+    "deepseek": {
       "enabled": true,
       "use_openrouter": true,
-      "model": "kimi-k2.5",
+      "model": "deepseek-v3.2",
       "openrouter_model": {
-        "none": "moonshotai/kimi-k2.5",
-        "web": "moonshotai/kimi-k2.5"
+        "none": "deepseek/deepseek-v3.2",
+        "web": "deepseek/deepseek-v3.2:online"
       }
     }
   },

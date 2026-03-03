@@ -26,7 +26,7 @@ Parse `$ARGUMENTS` to determine the subcommand and target:
 - **`update [provider]`** — Update models to latest versions (existing behavior)
 - **`add <model>`** — Add a new provider via OpenRouter
 - **`remove <provider>`** — Remove an existing provider
-- **`<provider>`** — Interactive configuration for an existing provider (e.g. `openai`, `gemini`, `kimi`). Detected when the first argument matches an existing provider key in config and is not one of the subcommand keywords above.
+- **`<provider>`** — Interactive configuration for an existing provider (e.g. `openai`, `gemini`, `deepseek`). Detected when the first argument matches an existing provider key in config and is not one of the subcommand keywords above.
 
 **Flags:**
 - **`--reset`** — Reset the provider (or all providers) back to plugin defaults by removing customizations from the user config file
@@ -70,7 +70,7 @@ Check and update model versions, searching for the latest available models.
 
 - **`openai`** — Update only the OpenAI provider
 - **`gemini`** — Update only the Gemini provider
-- **`kimi`** — Update only the Kimi provider
+- **`deepseek`** — Update only the DeepSeek provider
 - **`all`** or empty — Update all providers (default)
 
 ### Read Current Configuration
@@ -85,9 +85,9 @@ Load the effective configuration (user config merged over plugin defaults). Disp
 | Gemini | `model` | (value) |
 | Gemini | `openrouter_model.none` | (value) |
 | Gemini | `openrouter_model.web` | (value) |
-| Kimi | `model` | (value) |
-| Kimi | `openrouter_model.none` | (value) |
-| Kimi | `openrouter_model.web` | (value) |
+| DeepSeek | `model` | (value) |
+| DeepSeek | `openrouter_model.none` | (value) |
+| DeepSeek | `openrouter_model.web` | (value) |
 
 ### Search for Latest Models
 
@@ -95,7 +95,7 @@ Use WebSearch to find the latest stable/GA model versions for each in-scope prov
 
 - **OpenAI**: Search for the latest GPT model available via the OpenAI API and on OpenRouter. Look for the current flagship model name.
 - **Gemini**: Search for the latest Google Gemini model available via the Gemini API and on OpenRouter. Look for the current flagship model name.
-- **Kimi**: Search for the latest Moonshot Kimi model available on OpenRouter. Look for the current flagship model name.
+- **DeepSeek**: Search for the latest DeepSeek model available on OpenRouter. Look for the current flagship model name.
 
 Prefer stable/GA releases over preview or experimental models unless the user explicitly requests otherwise.
 
@@ -107,7 +107,7 @@ When determining the correct config values, follow these naming conventions:
 |----------|--------------|------------------------|----------------------|
 | OpenAI | Bare model name (e.g. `gpt-5.2`) | `openai/<model>` (e.g. `openai/gpt-5.2`) | `openai/<model>:online` (e.g. `openai/gpt-5.2:online`) |
 | Gemini | Bare model name (e.g. `gemini-3.1-pro`) | `google/<model>` (e.g. `google/gemini-3.1-pro`) | `google/<model>:online` (e.g. `google/gemini-3.1-pro:online`) |
-| Kimi | Bare model name (e.g. `kimi-k2.5`) | `moonshotai/<model>` (e.g. `moonshotai/kimi-k2.5`) | `moonshotai/<model>` (same — no `:online` variant) |
+| DeepSeek | Bare model name (e.g. `deepseek-v3.2`) | `deepseek/<model>` (e.g. `deepseek/deepseek-v3.2`) | `deepseek/<model>:online` (e.g. `deepseek/deepseek-v3.2:online`) |
 
 ### Present Comparison
 
@@ -180,7 +180,7 @@ Rules for the provider key:
 - Lowercase, no spaces
 - If the provider key already exists in config, warn the user and ask how to proceed
 
-If no `:online` variant exists, set `web` to the same value as `none` (same pattern as Kimi).
+If no `:online` variant exists, set `web` to the same value as `none`.
 
 ### Confirm with User
 
@@ -208,15 +208,15 @@ Remove or disable an existing provider from the configuration.
 
 ### Parse Provider Name
 
-Extract the user's fuzzy provider name from `$ARGUMENTS` (everything after `remove`). Examples: "kimi", "moonshot", "that k2.5 model", "deepseek", "llama".
+Extract the user's fuzzy provider name from `$ARGUMENTS` (everything after `remove`). Examples: "deepseek", "gemini", "openai", "llama".
 
 ### Match Against Existing Providers
 
 Read the current config and find the matching provider:
 
-1. Try exact match on provider key (e.g. `kimi`, `openai`, `gemini`)
-2. Try fuzzy match on model name (e.g. "k2.5" → kimi, "gpt" → openai)
-3. Try fuzzy match on openrouter model IDs (e.g. "moonshot" → kimi via `moonshotai/...`)
+1. Try exact match on provider key (e.g. `deepseek`, `openai`, `gemini`)
+2. Try fuzzy match on model name (e.g. "v3.2" → deepseek, "gpt" → openai)
+3. Try fuzzy match on openrouter model IDs (e.g. "google" → gemini via `google/...`)
 
 If no match is found, show the available providers and ask the user to clarify.
 If multiple matches are found, list them and ask the user to pick one.
@@ -234,7 +234,7 @@ Show the provider that will be removed, including its full config entry, and ask
 
 1. Read `~/.claude/consensus_config.json` (if it doesn't exist, create it)
 2. To remove a provider that was **added by the user** (exists in user config): delete the entry entirely
-3. To remove a provider that comes from **plugin defaults** (openai, gemini, kimi): add an entry with `"enabled": false` to the user config to override the default
+3. To remove a provider that comes from **plugin defaults** (openai, gemini, deepseek): add an entry with `"enabled": false` to the user config to override the default
 4. Write back with 2-space JSON indentation and trailing newline
 5. **Never include `api_keys`** in the user config file — keys come from environment variables
 
@@ -248,7 +248,7 @@ Read back the config file and display the updated provider table to confirm the 
 
 Interactively configure an existing provider — choose the model and routing method.
 
-Triggered when `$ARGUMENTS` starts with an existing provider key (e.g. `openai`, `gemini`, `kimi`) that isn't one of the keyword subcommands (`check`, `update`, `add`, `remove`).
+Triggered when `$ARGUMENTS` starts with an existing provider key (e.g. `openai`, `gemini`, `deepseek`) that isn't one of the keyword subcommands (`check`, `update`, `add`, `remove`).
 
 ### Show Current Config
 

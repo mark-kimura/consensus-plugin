@@ -1,10 +1,10 @@
 # Consensus — Multi-AI Provider Plugin for Claude Code
 
-Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, Kimi K2.5) for diverse perspectives, right from within Claude Code.
+Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, DeepSeek V3.2) for diverse perspectives, right from within Claude Code.
 
 ## How It Works
 
-When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5.2, Gemini 3.1 Pro, and Kimi K2.5 via OpenRouter by default — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
+When you're stuck on a problem, Consensus queries multiple AI providers concurrently — GPT-5.2, Gemini 3.1 Pro, and DeepSeek V3.2 via OpenRouter by default — then synthesizes their responses to surface common themes, unique insights, and actionable takeaways.
 
 ## Installation
 
@@ -76,7 +76,7 @@ This also auto-triggers when you say things like:
 /consensus:config              # Show current providers (same as check)
 /consensus:config update       # Update all providers to latest models
 /consensus:config add llama 4  # Add a new provider via OpenRouter
-/consensus:config remove kimi  # Remove a provider
+/consensus:config remove deepseek  # Remove a provider
 /consensus:config openai       # Interactively configure OpenAI (model + routing)
 /consensus:config --reset      # Reset all providers to plugin defaults
 ```

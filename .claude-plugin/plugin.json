@@ -1,7 +1,7 @@
 {
   "name": "consensus",
-  "version": "1.6.0",
-  "description": "Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, etc.) for diverse perspectives",
+  "version": "1.7.0",
+  "description": "Get unstuck by querying multiple AI providers (GPT-5.2, Gemini, DeepSeek) for diverse perspectives",
   "license": "MIT",
   "author": {
     "name": "Mark Kimura"

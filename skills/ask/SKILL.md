@@ -2,7 +2,7 @@
 description: >
   When the user wants to cross-check ideas across multiple AI providers — look for phrases like
   "consensus", "multiple perspectives", "what do other AIs think", "cross-check", "second opinion",
-  "ask other models", or "get diverse perspectives". This skill queries GPT-5.2, Gemini, and Kimi K2.5
+  "ask other models", or "get diverse perspectives". This skill queries GPT-5.2, Gemini, and DeepSeek V3.2
   concurrently via OpenRouter and synthesizes their responses. NOTE: This calls external paid APIs
   using the user's own API keys, so only trigger when the user clearly intends it.
 allowed-tools:
@@ -16,7 +16,7 @@ argument-hint: "[optional: specific focus area or leave empty for context-based]
 
 # Consensus — Query Multiple AIs
 
-You will analyze the user's request and current context, craft a comprehensive prompt, then query multiple AI providers concurrently (GPT-5.2, Gemini, and Kimi K2.5 via OpenRouter by default) and consolidate their responses.
+You will analyze the user's request and current context, craft a comprehensive prompt, then query multiple AI providers concurrently (GPT-5.2, Gemini, and DeepSeek V3.2 via OpenRouter by default) and consolidate their responses.
 
 Arguments provided: $ARGUMENTS
 
@@ -88,6 +88,6 @@ When $ARGUMENTS is empty, gather context by:
 Default providers (via OpenRouter):
 - **OpenAI GPT-5.2**: Responses API with reasoning capabilities
 - **Google Gemini 3.1 Pro**: Large context with thinking capabilities
-- **Moonshot Kimi K2.5**: Multimodal with strong coding and agentic capabilities
+- **DeepSeek V3.2**: GPT-5 class reasoning at a fraction of the cost, strong math and logic
 
 Additional providers can be enabled in `consensus_config.json`. Providers with missing API keys are silently skipped. At least one key is required.
