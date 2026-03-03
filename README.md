@@ -108,8 +108,16 @@ The plugin works out of the box with just `OPENROUTER_API_KEY`. For advanced con
 
 ## Search Modes
 
-- **`web`** (default): Providers include current web information. Good for recent technologies.
-- **`none`**: Fast responses without web search. Good for coding questions.
+By default, providers include current web information in their responses. If you'd rather get purely model-based perspectives without web search, just say so naturally:
+
+- "Get a consensus on this, no web search"
+- "What do other models think — don't use the web"
+- "/consensus:ask without web search, compare approaches to caching"
+
+Claude will detect your intent and run in the appropriate mode:
+
+- **`web`** (default): Providers include current web information. Good for questions about recent technologies or current best practices.
+- **`none`**: Pure model knowledge, no web search. Faster responses. Good for coding questions, architecture decisions, or when you want unbiased model perspectives.
 
 ## Project Structure
 
