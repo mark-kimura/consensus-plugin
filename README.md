@@ -70,12 +70,14 @@ This also auto-triggers when you say things like:
 - "Can I get a consensus on this?"
 - "Cross-check this with other models"
 
-### `/consensus:update`
+### `/consensus:config`
 
 ```
-/consensus:update              # Update all providers to latest models
-/consensus:update openai       # Update only OpenAI
-/consensus:update check        # Dry-run: show current vs. latest without changes
+/consensus:config              # Show current providers (same as check)
+/consensus:config check        # Show current providers
+/consensus:config update       # Update all providers to latest models
+/consensus:config add llama 4  # Add a new provider via OpenRouter
+/consensus:config remove kimi  # Remove a provider
 ```
 
 ### What Happens
@@ -114,7 +116,7 @@ consensus-plugin/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest
 ├── commands/
-│   └── update.md                # /consensus:update command
+│   └── config.md                # /consensus:config command
 ├── skills/
 │   └── ask/
 │       └── SKILL.md             # /consensus:ask skill (also auto-triggers)
