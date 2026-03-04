@@ -40,7 +40,7 @@ Add them to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across
 /plugin install consensus@kahidreamers-marketplace
 ```
 
-**Option B — Official Plugin Directory** (submitted, under review by Anthropic):
+**Option B — Official Plugin Directory** (not yet available — submitted, under review by Anthropic):
 
 ```
 /plugin install consensus@claude-plugin-directory
