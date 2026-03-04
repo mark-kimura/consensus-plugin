@@ -33,7 +33,7 @@ Add them to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across
 
 ### 3. Install the Plugin
 
-**Option A — KahiDreamers Marketplace**:
+**Option A — Third-Party Marketplace**:
 
 ```
 /plugin marketplace add mark-kimura/kahidreamers-marketplace
