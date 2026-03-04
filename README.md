@@ -33,7 +33,13 @@ Add them to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across
 
 ### 3. Install the Plugin
 
-In Claude Code, run these two commands:
+**Option A — Official Plugin Directory** (pending approval):
+
+```
+/plugin install consensus@claude-plugin-directory
+```
+
+**Option B — KahiDreamers Marketplace** (available now):
 
 ```
 /plugin marketplace add mark-kimura/kahidreamers-marketplace
@@ -42,7 +48,7 @@ In Claude Code, run these two commands:
 
 ### 4. Enable Auto-Update (Recommended)
 
-By default, third-party plugins don't auto-update. To get new versions automatically on session start:
+For the official directory, auto-update is enabled by default. For third-party marketplaces, enable it manually:
 
 1. Run `/plugin` in Claude Code
 2. Go to **Marketplaces**
