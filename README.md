@@ -33,17 +33,17 @@ Add them to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across
 
 ### 3. Install the Plugin
 
-**Option A — Official Plugin Directory** (pending approval):
-
-```
-/plugin install consensus@claude-plugin-directory
-```
-
-**Option B — KahiDreamers Marketplace** (available now):
+**Option A — KahiDreamers Marketplace**:
 
 ```
 /plugin marketplace add mark-kimura/kahidreamers-marketplace
 /plugin install consensus@kahidreamers-marketplace
+```
+
+**Option B — Official Plugin Directory** (submitted, under review by Anthropic):
+
+```
+/plugin install consensus@claude-plugin-directory
 ```
 
 ### 4. Enable Auto-Update (Recommended)
