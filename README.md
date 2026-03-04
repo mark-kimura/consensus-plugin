@@ -92,10 +92,10 @@ All intermediate files go to a temp directory — nothing is written to your pro
 
 ## Configuration
 
-The plugin works out of the box with just `OPENROUTER_API_KEY`. For advanced configuration, copy `consensus_config.json` to your project root and customize:
+The plugin works out of the box with just `OPENROUTER_API_KEY`. Use `/consensus:config` to manage providers interactively, or customize `consensus_config.json` directly:
 
-- **Provider routing**: Toggle `use_openrouter` per provider to route through OpenRouter or call APIs directly
-- **Models**: Change which model each provider uses
+- **Provider routing**: Route through OpenRouter or call APIs directly (`/consensus:config openai`)
+- **Models**: Add, remove, or update providers (`/consensus:config add llama 4`)
 - **Search modes**: Set default to `"web"` (includes web search) or `"none"` (faster, no web)
 - **Token limits**: Adjust `max_tokens` per provider
 
