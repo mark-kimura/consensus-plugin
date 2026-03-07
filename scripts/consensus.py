@@ -46,11 +46,11 @@ DEFAULT_CONFIG = {
         "openai": {
             "enabled": True,
             "use_openrouter": True,
-            "model": "gpt-5.2",
+            "model": "gpt-5.4",
             "endpoint": "https://api.openai.com/v1",
             "openrouter_model": {
-                "none": "openai/gpt-5.2",
-                "web": "openai/gpt-5.2:online",
+                "none": "openai/gpt-5.4",
+                "web": "openai/gpt-5.4:online",
             },
         },
         "gemini": {

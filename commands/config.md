@@ -105,7 +105,7 @@ When determining the correct config values, follow these naming conventions:
 
 | Provider | `model` field | `openrouter_model.none` | `openrouter_model.web` |
 |----------|--------------|------------------------|----------------------|
-| OpenAI | Bare model name (e.g. `gpt-5.2`) | `openai/<model>` (e.g. `openai/gpt-5.2`) | `openai/<model>:online` (e.g. `openai/gpt-5.2:online`) |
+| OpenAI | Bare model name (e.g. `gpt-5.4`) | `openai/<model>` (e.g. `openai/gpt-5.4`) | `openai/<model>:online` (e.g. `openai/gpt-5.4:online`) |
 | Gemini | Bare model name (e.g. `gemini-3.1-pro`) | `google/<model>` (e.g. `google/gemini-3.1-pro`) | `google/<model>:online` (e.g. `google/gemini-3.1-pro:online`) |
 | DeepSeek | Bare model name (e.g. `deepseek-v3.2`) | `deepseek/<model>` (e.g. `deepseek/deepseek-v3.2`) | `deepseek/<model>:online` (e.g. `deepseek/deepseek-v3.2:online`) |
 
